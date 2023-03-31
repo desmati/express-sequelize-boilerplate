@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo List</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+  <link href="/style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-sm-6">
+        <h4>Todo Items</h4>
+        <ul id="todo">
+          <% for(var i=0; i <tasks.length; i++){%>
+            <% if(tasks[i].status==='todo' ){ %>
+              <li>
+                <input type="checkbox" name="todo" value="<%= tasks[i].id%>"
+                  onclick='moveTask(event,"<%= tasks[i].id %>")' />
+                <%= tasks[i].title%>
+              </li>
+              <%} %>
+
+                <%} %>
+
+                  <li>
+                      <input type="text" name="title" id="title" placeholder="create new task" />
+                      <button type="button" onclick='addTask(event)'>
+                        ADD
+                      </button>
+                  </li>
+        </ul>
+      </div>
+      <div class="col-md-6 col-sm-6">
+        <h4>Completed Tasks</h4>
+        <ul id="done">
+          <% for(var i=0; i <tasks.length; i++){%>
+            <% if(tasks[i].status==='completed' ){ %>
+              <li><input checked type="checkbox" name="done" onclick='moveTask(event,"<%= tasks[i].id %>")' />
+                <%= tasks[i].title%>
+              </li>
+              <%} %>
+                <%} %>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script>
+    function moveTask(event, id) {
+      console.log(event.target);
+
+      fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        }
+        /*,
+        body: JSON.stringify({
+          name,
+          id
+        })*/
+      }).then(response => response.json()).then(result => {
+        console.log(result);
+        window.location.reload();
+      }).catch(err => console.log(err))
+    }
+
+    function addTask(event) {
+      event.preventDefault();
+
+      fetch(`/api/tasks/?userId=1`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title: document.getElementById("title").value,
+          userId: 1,
+          status: "todo"
+        })
+      }).then(result => {
+        window.location.reload();
+      }).catch(err => console.log(err))
+    }
+  </script>
+</body>
+
+</html>
